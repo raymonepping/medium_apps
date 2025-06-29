@@ -1,23 +1,22 @@
-# Base image
-FROM node:20.19.2
+# ----------------------------
+# 🧱 Build stage
+FROM node:20.19.2 AS builder
 
-# Set working directory
 WORKDIR /app
-
-# Copy package files first to install dependencies
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the project
 COPY . .
-
-# Build the Nuxt app
+RUN npm install
 RUN npm run build
 
-# Expose port
-EXPOSE 3000
+# ----------------------------
+# 🚀 Runtime stage
+FROM node:20.19.2
 
-# Start Nuxt in production
-CMD ["npm", "run", "start"]
+WORKDIR /app
+ENV NITRO_PORT=3000
+
+COPY --from=builder /app/.output .output
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json .
+
+EXPOSE 3000
+CMD ["node", ".output/server/index.mjs"]

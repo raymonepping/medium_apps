@@ -7,7 +7,7 @@ const colors = JSON.parse(fs.readFileSync("colors.json", "utf8"));
 
 app.get("/api/colors", (req, res) => {
   const query = (req.query.q || "").toLowerCase();
-  const matches = colors.filter(c => c.name.toLowerCase().includes(query));
+  const matches = colors.filter((c) => c.name.toLowerCase().includes(query));
   res.json(matches.slice(0, 5));
 });
 
